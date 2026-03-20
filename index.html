@@ -36,10 +36,8 @@
         linear-gradient(135deg, var(--bg1), var(--bg2));
     }
 
-    /* animated background glows */
     .glow {
       position: fixed;
-      inset: auto;
       width: 280px;
       height: 280px;
       border-radius: 50%;
@@ -63,6 +61,16 @@
       50% { transform: translateY(-10px) translateX(6px); }
     }
 
+    @keyframes shine {
+      0%, 35% { transform: translateX(-120%); }
+      70%, 100% { transform: translateX(120%); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     .wrap {
       min-height: 100vh;
       display: flex;
@@ -75,7 +83,7 @@
 
     .card {
       width: 100%;
-      max-width: 560px;
+      max-width: 760px;
       background: linear-gradient(180deg, rgba(13,23,48,.92), rgba(8,14,30,.94));
       border: 1px solid rgba(120,160,255,.18);
       border-radius: var(--radius);
@@ -95,11 +103,6 @@
       transform: translateX(-120%);
       animation: shine 6s ease-in-out infinite;
       pointer-events: none;
-    }
-
-    @keyframes shine {
-      0%, 35% { transform: translateX(-120%); }
-      70%, 100% { transform: translateX(120%); }
     }
 
     .top-banner {
@@ -153,7 +156,7 @@
     }
 
     .subtitle {
-      margin: 0 0 22px;
+      margin: 0 0 18px;
       color: var(--muted);
       font-size: 14px;
     }
@@ -196,6 +199,55 @@
       text-align: center;
     }
 
+    .progress-wrap {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(116,167,255,.12);
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .progress-track {
+      height: 8px;
+      background: rgba(255,255,255,.06);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(116,167,255,.12);
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #214cff, #2dd4bf);
+      border-radius: 999px;
+      transition: width .12s linear;
+    }
+
+    .copy-all-btn {
+      margin-top: 12px;
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(116,167,255,.3);
+      background: linear-gradient(135deg, #162b5d, #23458c);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .2s ease, filter .2s ease, opacity .2s ease;
+    }
+
+    .copy-all-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .copy-all-btn:disabled { opacity: .5; cursor: not-allowed; }
+
     #status {
       margin-top: 12px;
       min-height: 22px;
@@ -215,9 +267,33 @@
       margin-left: 6px;
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .preview-wrap {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(116,167,255,.12);
+    }
+
+    .preview-title {
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 10px;
+    }
+
+    .preview-grid img {
+      width: 100%;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid rgba(116,167,255,.2);
+      background: #050816;
     }
 
     .result {
@@ -228,47 +304,74 @@
       border: 1px solid rgba(116,167,255,.16);
     }
 
-    .result-title {
-      font-weight: 700;
-      margin-bottom: 12px;
+    .image-block {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(116,167,255,.14);
     }
 
-    .formats {
-      display: grid;
-      gap: 10px;
-      margin: 14px 0;
+    .image-block.deleted {
+      opacity: .55;
+      filter: grayscale(.35);
     }
 
-    .format {
+    .image-head {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 10px;
-      font-size: 14px;
-      color: #dbe7ff;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: rgba(255,255,255,.03);
-      border: 1px solid rgba(255,255,255,.05);
+      margin-bottom: 10px;
     }
 
-    .link-row {
-      display: flex;
-      gap: 10px;
-      align-items: stretch;
-      margin-top: 10px;
+    .image-head h3 {
+      margin: 0;
+      font-size: 15px;
     }
 
-    .link-text {
-      flex: 1;
-      padding: 12px 14px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(116,167,255,.18);
+    .uploaded-preview {
+      width: 100%;
+      max-height: 240px;
+      object-fit: contain;
+      background: #050816;
       border-radius: 14px;
+      border: 1px solid rgba(116,167,255,.16);
+    }
+
+    .section-title {
+      margin: 14px 0 8px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .field {
+      margin-top: 8px;
+    }
+
+    .field-title {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .link-value {
+      flex: 1;
+      min-height: 46px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(116,167,255,.18);
+      background: rgba(255,255,255,.05);
+      color: #eaf1ff;
       font-family: monospace;
       font-size: 13px;
-      word-break: break-all;
-      min-height: 46px;
-      color: #eaf1ff;
+      resize: vertical;
     }
 
     .copy-btn {
@@ -280,7 +383,7 @@
       border-radius: 14px;
       cursor: pointer;
       font-weight: 800;
-      transition: transform .2s ease, filter .2s ease;
+      transition: transform .2s ease, filter .2s ease, opacity .2s ease;
     }
 
     .copy-btn:hover {
@@ -288,15 +391,41 @@
       filter: brightness(1.06);
     }
 
-    #viewLink {
-      display: inline-block;
-      margin-top: 12px;
-      color: #8ab4ff;
-      text-decoration: none;
-      font-weight: 700;
+    .copy-btn:active { transform: translateY(0); }
+    .copy-btn.mini {
+      min-width: 108px;
+      border-radius: 12px;
+      padding: 0 12px;
     }
 
-    #viewLink:hover { text-decoration: underline; }
+    .delete-btn {
+      margin-top: 12px;
+      width: 100%;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .2s ease, filter .2s ease, opacity .2s ease;
+    }
+
+    .delete-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .deleted-note {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #fca5a5;
+      display: none;
+    }
+
+    .image-block.deleted .deleted-note {
+      display: block;
+    }
 
     footer {
       margin-top: 18px;
@@ -308,9 +437,10 @@
 
     @media (max-width: 520px) {
       .card { padding: 16px; }
-      .link-row { flex-direction: column; }
-      .copy-btn { width: 100%; min-height: 46px; }
+      .field-row { flex-direction: column; }
+      .copy-btn.mini, .copy-btn { width: 100%; min-height: 46px; }
       .top-banner .line2 { font-size: 16px; }
+      .image-head { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -329,128 +459,238 @@
       </div>
 
       <h1>Загрузите фото — получите ссылку</h1>
-      <p class="subtitle">Быстрая загрузка и удобные форматы ссылки.</p>
+      <p class="subtitle">Быстрая загрузка, предпросмотр, прогресс и все нужные форматы ссылок.</p>
 
       <div class="upload-wrap">
-        <input id="fileInput" type="file" accept="image/*" style="display:none" />
+        <input id="fileInput" type="file" accept="image/*" multiple style="display:none" />
         <label class="upload-btn" for="fileInput">ВЫБРАТЬ И ЗАГРУЗИТЬ</label>
-        <div class="small">Поддерживаются изображения любых популярных форматов.</div>
+        <div class="small">Можно выбрать до 20 фото сразу.</div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-top">
+          <span>Прогресс загрузки</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <button id="copyAllBtn" class="copy-all-btn" type="button" disabled>Скопировать всё</button>
+      </div>
+
+      <div id="previewWrap" class="preview-wrap" style="display:none;">
+        <div class="preview-title">Превью перед загрузкой</div>
+        <div id="previewGrid" class="preview-grid"></div>
       </div>
 
       <div id="status"></div>
 
       <div id="resultArea" class="result" style="display:none">
-        <div class="result-title">[Фото 1]</div>
-
-        <div class="formats">
-          <label class="format"><input type="radio" name="format" value="direct" checked> Прямая ссылка</label>
-          <label class="format"><input type="radio" name="format" value="html"> HTML &lt;img&gt;</label>
-          <label class="format"><input type="radio" name="format" value="html_link"> HTML с ссылкой</label>
-          <label class="format"><input type="radio" name="format" value="bb_full_link"> BB-код со ссылкой</label>
-        </div>
-
-        <div class="link-row">
-          <div id="linkText" class="link-text" aria-live="polite"></div>
-          <button id="copyBtn" class="copy-btn">Копировать</button>
-        </div>
-
-        <a id="viewLink" href="#" target="_blank">Открыть изображение</a>
+        <div id="imagesContainer"></div>
       </div>
 
       <footer>
-        Красиво, просто используй для кайфа.
+        Красиво, просто и удобно.
       </footer>
     </div>
   </main>
 
   <script>
-    // Вставь свой API-ключ imgbb
     const IMGBB_API_KEY = '4a569847f7d6be115b4e46120f2d1f73';
 
     const fileInput = document.getElementById('fileInput');
     const status = document.getElementById('status');
     const resultArea = document.getElementById('resultArea');
-    const linkText = document.getElementById('linkText');
-    const copyBtn = document.getElementById('copyBtn');
-    const viewLink = document.getElementById('viewLink');
+    const imagesContainer = document.getElementById('imagesContainer');
+    const previewWrap = document.getElementById('previewWrap');
+    const previewGrid = document.getElementById('previewGrid');
+    const progressFill = document.getElementById('progressFill');
+    const progressPercent = document.getElementById('progressPercent');
+    const copyAllBtn = document.getElementById('copyAllBtn');
 
-    let uploadedUrl = '';
-
-    fileInput.addEventListener('change', async () => {
-      if (!fileInput.files.length) return;
-
-      const file = fileInput.files[0];
-      status.innerHTML = 'Загружаю <span class="spinner" aria-hidden="true"></span>';
-
-      const reader = new FileReader();
-
-      reader.onload = async (e) => {
-        const base64 = e.target.result.split(',')[1];
-
-        try {
-          const form = new FormData();
-          form.append('key', IMGBB_API_KEY);
-          form.append('image', base64);
-
-          const res = await fetch('https://api.imgbb.com/1/upload', {
-            method: 'POST',
-            body: form
-          });
-
-          const json = await res.json();
-
-          if (json.success) {
-            uploadedUrl = json.data.url;
-            status.innerHTML = '<span style="color:#2dd4bf;font-weight:700">Готово — ссылка получена.</span>';
-            resultArea.style.display = 'block';
-            updateLinkText();
-            viewLink.href = uploadedUrl;
-          } else {
-            status.innerHTML = '<span style="color:#ff7b7b">Ошибка сервиса: ' + (json.error?.message || 'неизвестная ошибка') + '</span>';
-          }
-        } catch (err) {
-          status.innerHTML = '<span style="color:#ff7b7b">Ошибка сети или неверный API ключ.</span>';
-          console.error(err);
-        }
-      };
-
-      reader.readAsDataURL(file);
-    });
-
-    document.querySelectorAll('input[name=format]').forEach(r => {
-      r.addEventListener('change', updateLinkText);
-    });
-
-    function updateLinkText() {
-      if (!uploadedUrl) return;
-
-      const fmt = document.querySelector('input[name=format]:checked').value;
-      let txt = '';
-
-      switch (fmt) {
-        case 'direct':
-          txt = uploadedUrl;
-          break;
-        case 'html':
-          txt = `<img src="${uploadedUrl}" alt="Uploaded image">`;
-          break;
-        case 'html_link':
-          txt = `<a href="${uploadedUrl}" target="_blank"><img src="${uploadedUrl}" alt="Uploaded image"></a>`;
-          break;
-        case 'bb_full_link':
-          txt = `[url=${uploadedUrl}][img]${uploadedUrl}[/img][/url]`;
-          break;
-      }
-
-      linkText.textContent = txt;
+    function setProgress(percent) {
+      const value = Math.max(0, Math.min(100, Math.round(percent)));
+      progressFill.style.width = value + '%';
+      progressPercent.textContent = value + '%';
     }
 
-    copyBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(linkText.textContent).then(() => {
-        copyBtn.textContent = 'Скопировано!';
-        setTimeout(() => copyBtn.textContent = 'Копировать', 2000);
+    function safeText(value) {
+      return String(value ?? '');
+    }
+
+    function makeField(title, value) {
+      const field = document.createElement('div');
+      field.className = 'field';
+
+      const label = document.createElement('div');
+      label.className = 'field-title';
+      label.textContent = title;
+
+      const row = document.createElement('div');
+      row.className = 'field-row';
+
+      const ta = document.createElement('textarea');
+      ta.className = 'link-value';
+      ta.readOnly = true;
+      ta.value = safeText(value);
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'copy-btn mini';
+      btn.textContent = 'Копировать';
+      btn.dataset.copyRow = '1';
+
+      row.appendChild(ta);
+      row.appendChild(btn);
+      field.appendChild(label);
+      field.appendChild(row);
+
+      return field;
+    }
+
+    function buildCopyText(index, data) {
+      const viewerUrl = data.url_viewer || '';
+      const fullUrl = data.url || '';
+      const displayUrl = data.display_url || fullUrl;
+      const mediumUrl = data.medium?.url || displayUrl;
+      const thumbUrl = data.thumb?.url || displayUrl;
+
+      return [
+        `[Фото ${index}]`,
+        'Ссылки на просмотр',
+        `Ссылка на просмотр: ${viewerUrl}`,
+        `Прямая ссылка: ${fullUrl}`,
+        '',
+        'HTML-коды',
+        `HTML-код изображения: <img src="${displayUrl}" alt="Uploaded image">`,
+        `HTML-код полноразмерного изображения со ссылкой: <a href="${viewerUrl}" target="_blank" rel="noopener"><img src="${fullUrl}" alt="Uploaded image"></a>`,
+        `HTML-код среднего размера со ссылкой: <a href="${viewerUrl}" target="_blank" rel="noopener"><img src="${mediumUrl}" alt="Uploaded image"></a>`,
+        `HTML-код миниатюры со ссылкой: <a href="${viewerUrl}" target="_blank" rel="noopener"><img src="${thumbUrl}" alt="Uploaded image"></a>`,
+        '',
+        'ВВ-коды',
+        `ВВ-код полноразмерного изображения: [img]${fullUrl}[/img]`,
+        `ВВ-код полноразмерного изображения со ссылкой: [url=${viewerUrl}][img]${fullUrl}[/img][/url]`,
+        `ВВ-код среднего размера со ссылкой: [url=${viewerUrl}][img]${mediumUrl}[/img][/url]`,
+        `ВВ-код миниатюры со ссылкой: [url=${viewerUrl}][img]${thumbUrl}[/img][/url]`
+      ].join('\n');
+    }
+
+    function createImageBlock(index, data) {
+      const viewerUrl = data.url_viewer || '';
+      const fullUrl = data.url || '';
+      const displayUrl = data.display_url || fullUrl;
+      const mediumUrl = data.medium?.url || displayUrl;
+      const thumbUrl = data.thumb?.url || displayUrl;
+      const deleteUrl = data.delete_url || '';
+
+      const block = document.createElement('div');
+      block.className = 'image-block';
+      block.dataset.copyText = buildCopyText(index, data);
+      block.dataset.deleteUrl = deleteUrl;
+
+      const head = document.createElement('div');
+      head.className = 'image-head';
+
+      const title = document.createElement('h3');
+      title.textContent = `[Фото ${index}]`;
+
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = 'Готово';
+
+      head.appendChild(title);
+      head.appendChild(badge);
+
+      const img = document.createElement('img');
+      img.className = 'uploaded-preview';
+      img.src = displayUrl;
+      img.alt = `Фото ${index}`;
+
+      const sec1 = document.createElement('div');
+      sec1.className = 'section-title';
+      sec1.textContent = 'Ссылки на просмотр';
+
+      const sec2 = document.createElement('div');
+      sec2.className = 'section-title';
+      sec2.textContent = 'HTML-коды';
+
+      const sec3 = document.createElement('div');
+      sec3.className = 'section-title';
+      sec3.textContent = 'ВВ-коды';
+
+      block.appendChild(head);
+      block.appendChild(img);
+      block.appendChild(sec1);
+      block.appendChild(makeField('Ссылка на просмотр', viewerUrl));
+      block.appendChild(makeField('Прямая ссылка', fullUrl));
+
+      block.appendChild(sec2);
+      block.appendChild(makeField('HTML-код изображения', `<img src="${displayUrl}" alt="Uploaded image">`));
+      block.appendChild(makeField(
+        'HTML-код полноразмерного изображения со ссылкой',
+        `<a href="${viewerUrl}" target="_blank" rel="noopener"><img src="${fullUrl}" alt="Uploaded image"></a>`
+      ));
+      block.appendChild(makeField(
+        'HTML-код среднего размера со ссылкой',
+        `<a href="${viewerUrl}" target="_blank" rel="noopener"><img src="${mediumUrl}" alt="Uploaded image"></a>`
+      ));
+      block.appendChild(makeField(
+        'HTML-код миниатюры со ссылкой',
+        `<a href="${viewerUrl}" target="_blank" rel="noopener"><img src="${thumbUrl}" alt="Uploaded image"></a>`
+      ));
+
+      block.appendChild(sec3);
+      block.appendChild(makeField('ВВ-код полноразмерного изображения', `[img]${fullUrl}[/img]`));
+      block.appendChild(makeField(
+        'ВВ-код полноразмерного изображения со ссылкой',
+        `[url=${viewerUrl}][img]${fullUrl}[/img][/url]`
+      ));
+      block.appendChild(makeField(
+        'ВВ-код среднего размера со ссылкой',
+        `[url=${viewerUrl}][img]${mediumUrl}[/img][/url]`
+      ));
+      block.appendChild(makeField(
+        'ВВ-код миниатюры со ссылкой',
+        `[url=${viewerUrl}][img]${thumbUrl}[/img][/url]`
+      ));
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.dataset.deleteImage = '1';
+      deleteBtn.textContent = 'Удалить изображение';
+
+      const deletedNote = document.createElement('div');
+      deletedNote.className = 'deleted-note';
+      deletedNote.textContent = 'Изображение помечено как удалённое.';
+
+      block.appendChild(deleteBtn);
+      block.appendChild(deletedNote);
+
+      return block;
+    }
+
+    function copyRow(button) {
+      const row = button.closest('.field-row');
+      if (!row) return;
+
+      const ta = row.querySelector('.link-value');
+      if (!ta) return;
+
+      navigator.clipboard.writeText(ta.value).then(() => {
+        const old = button.textContent;
+        button.textContent = 'Скопировано!';
+        setTimeout(() => {
+          button.textContent = old;
+        }, 1200);
       }).catch(err => console.error('Ошибка копирования:', err));
-    });
-  </script>
-</body>
-    </html>
+    }
+
+    async function copyAll() {
+      const blocks = Array.from(document.querySelectorAll('.image-block:not(.deleted)'));
+      const text = blocks.map(b => b.dataset.copyText).filter(Boolean).join('\n\n');
+
+      if (!text) return;
+
+      try {
+  
