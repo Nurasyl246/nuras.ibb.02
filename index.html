@@ -687,10 +687,16 @@
     }
 
     async function copyAll() {
-      const blocks = Array.from(document.querySelectorAll('.image-block:not(.deleted)'));
-      const text = blocks.map(b => b.dataset.copyText).filter(Boolean).join('\n\n');
+  const blocks = Array.from(document.querySelectorAll('.image-block:not(.deleted)'));
+  const text = blocks.map(b => b.dataset.copyText).filter(Boolean).join('\n\n');
 
-      if (!text) return;
+  if (!text) return;
 
-      try {
-  
+  try {
+    await navigator.clipboard.writeText(text);
+    alert('Все ссылки скопированы!');
+  } catch (err) {
+    console.error(err);
+    alert('Ошибка копирования');
+  }
+    }
