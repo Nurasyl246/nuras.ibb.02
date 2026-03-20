@@ -1,260 +1,456 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Фотохостинг</title>
-    <style>
-        /* Новые стили для интерфейса загрузки */
-        .flower {
-            position: fixed;
-            width: 120px;
-            height: 120px;
-            opacity: 0.1;
-            z-index: -1;
-        }
-        .f1 {
-            top: 10%;
-            left: 10%;
-            animation: float 6s ease-in-out infinite;
-        }
-        .f2 {
-            top: 20%;
-            right: 10%;
-            animation: float 8s ease-in-out infinite reverse;
-        }
-        .f3 {
-            bottom: 10%;
-            left: 20%;
-            animation: float 10s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        .center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-        .subscribe {
-            margin-bottom: 30px;
-            font-size: 14px;
-            color: #666;
-        }
-        .subscribe a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .upload-wrap {
-            margin: 20px 0;
-        }
-        .upload-btn {
-            display: inline-block;
-            padding: 12px 24px;
-            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: transform 0.2s;
-        }
-        .upload-btn:hover {
-            transform: scale(1.05);
-        }
-        .small {
-            font-size: 12px;
-            color: #888;
-            margin-top: 8px;
-        }
-        .result {
-            margin-top: 20px;
-            text-align: left;
-        }
-        .formats {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin: 15px 0;
-        }
-        .format {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-        .link-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .link-text {
-            flex: 1;
-            padding: 8px;
-            background: #f5f5f5;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 14px;
-            word-break: break-all;
-        }
-        .copy-btn {
-            padding: 8px 16px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .copy-btn:hover {
-            background: #218838;
-        }
-        footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #888;
-        }
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuras.ibb</title>
+  <style>
+    :root{
+      --bg1:#050816;
+      --bg2:#09142b;
+      --card:#0b1220cc;
+      --card2:#0d1730;
+      --line:#1f3b77;
+      --line2:#2f6bff;
+      --text:#eaf1ff;
+      --muted:#9db0d0;
+      --blue:#3c7dff;
+      --blue2:#74a7ff;
+      --green:#2dd4bf;
+      --shadow: 0 24px 80px rgba(0,0,0,.45);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(60,125,255,.20), transparent 26%),
+        radial-gradient(circle at top right, rgba(116,167,255,.16), transparent 22%),
+        radial-gradient(circle at bottom left, rgba(45,212,191,.10), transparent 20%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    /* animated background glows */
+    .glow {
+      position: fixed;
+      inset: auto;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      filter: blur(36px);
+      opacity: .22;
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 12s ease-in-out infinite;
+    }
+    .g1 { top: 8%; left: 6%; background: #2f6bff; }
+    .g2 { top: 18%; right: 6%; background: #6ea8ff; animation-duration: 16s; }
+    .g3 { bottom: 8%; left: 18%; background: #0ea5e9; animation-duration: 18s; }
+
+    @keyframes drift {
+      0%,100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(18px,-20px) scale(1.08); }
+    }
+
+    @keyframes floatUp {
+      0%,100% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(-10px) translateX(6px); }
+    }
+
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 560px;
+      background: linear-gradient(180deg, rgba(13,23,48,.92), rgba(8,14,30,.94));
+      border: 1px solid rgba(120,160,255,.18);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(120deg, transparent 0%, rgba(255,255,255,.05) 35%, transparent 70%);
+      transform: translateX(-120%);
+      animation: shine 6s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes shine {
+      0%, 35% { transform: translateX(-120%); }
+      70%, 100% { transform: translateX(120%); }
+    }
+
+    .top-banner {
+      border: 1px solid rgba(116,167,255,.38);
+      background: linear-gradient(180deg, rgba(8,18,38,.95), rgba(10,18,40,.8));
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+      animation: floatUp 5s ease-in-out infinite;
+    }
+
+    .top-banner .line1 {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .top-banner .line2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: .2px;
+    }
+
+    .top-banner a {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: white;
+      font-weight: 700;
+      border: 1px solid rgba(116,167,255,.55);
+      background: linear-gradient(135deg, #214cff, #4a86ff);
+      box-shadow: 0 10px 24px rgba(47,107,255,.25);
+      transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    }
+
+    .top-banner a:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 14px 28px rgba(47,107,255,.35);
+      filter: brightness(1.05);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(26px, 4vw, 38px);
+      line-height: 1.1;
+      letter-spacing: .2px;
+    }
+
+    .subtitle {
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .upload-wrap {
+      margin: 16px 0 10px;
+    }
+
+    .upload-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 15px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(116,167,255,.45);
+      background: linear-gradient(135deg, rgba(30,64,175,.95), rgba(18,96,170,.95));
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      box-shadow: 0 18px 30px rgba(13,78,143,.22);
+      transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+      user-select: none;
+    }
+
+    .upload-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 40px rgba(13,78,143,.32);
+      filter: brightness(1.06);
+    }
+
+    .small {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    #status {
+      margin-top: 12px;
+      min-height: 22px;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,.2);
+      border-top: 2px solid #8ab4ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      vertical-align: -3px;
+      margin-left: 6px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .result {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(7, 13, 28, .75);
+      border: 1px solid rgba(116,167,255,.16);
+    }
+
+    .result-title {
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .formats {
+      display: grid;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .format {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #dbe7ff;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.05);
+    }
+
+    .link-row {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+      margin-top: 10px;
+    }
+
+    .link-text {
+      flex: 1;
+      padding: 12px 14px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(116,167,255,.18);
+      border-radius: 14px;
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+      min-height: 46px;
+      color: #eaf1ff;
+    }
+
+    .copy-btn {
+      padding: 0 16px;
+      min-width: 124px;
+      background: linear-gradient(135deg, #14b8a6, #2dd4bf);
+      color: #06131d;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform .2s ease, filter .2s ease;
+    }
+
+    .copy-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+    }
+
+    #viewLink {
+      display: inline-block;
+      margin-top: 12px;
+      color: #8ab4ff;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    #viewLink:hover { text-decoration: underline; }
+
+    footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    @media (max-width: 520px) {
+      .card { padding: 16px; }
+      .link-row { flex-direction: column; }
+      .copy-btn { width: 100%; min-height: 46px; }
+      .top-banner .line2 { font-size: 16px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="flower f1" aria-hidden="true"></div>
-      <div class="flower f2" aria-hidden="true"></div>
-        <div class="flower f3" aria-hidden="true"></div>
+  <div class="glow g1" aria-hidden="true"></div>
+  <div class="glow g2" aria-hidden="true"></div>
+  <div class="glow g3" aria-hidden="true"></div>
 
-          <main class="center">
-              <div class="card">
-                    <div class="subscribe">
-                            <div>Подпишитесь на <strong>Нураса</strong></div>
-                                    <div><a id="subscribeBtn" href="https://vk.ru/nurasylsattar" target="_blank" rel="noopener">Подписаться</a></div>
-                                          </div>
+  <main class="wrap">
+    <div class="card">
+      <div class="top-banner">
+        <div class="line1">Подпишись на Нураса в ВК!</div>
+        <div class="line2">Nuras.ibb</div>
+        <div style="margin-top:6px;color:#b8c8e8;font-size:13px;">Лучший способ делиться своими моментами</div>
+        <a href="https://vk.ru/nurasylsattar" target="_blank" rel="noopener">ПОДПИСАТЬСЯ</a>
+      </div>
 
-                                                <h1>Загрузите фото — получите ссылку</h1>
+      <h1>Загрузите фото — получите ссылку</h1>
+      <p class="subtitle">Быстрая загрузка, стильный интерфейс и удобные форматы ссылки.</p>
 
-                                                      <div class="upload-wrap">
-                                                              <input id="fileInput" type="file" accept="image/*" style="display:none">
-                                                                      <label class="upload-btn" for="fileInput">Загрузить фото</label>
-                                                                              <div class="small">JPG, PNG, GIF, WEBP — максимум 5 МБ.</div>
-                                                                                    </div>
+      <div class="upload-wrap">
+        <input id="fileInput" type="file" accept="image/*" style="display:none" />
+        <label class="upload-btn" for="fileInput">ВЫБРАТЬ И ЗАГРУЗИТЬ</label>
+        <div class="small">Поддерживаются изображения любых популярных форматов.</div>
+      </div>
 
-                                                                                          <div id="status" style="margin-top:12px"></div>
+      <div id="status"></div>
 
-                                                                                                <div id="resultArea" class="result" style="display:none">
-                                                                                                        <div style="font-weight:600;margin-bottom:8px">[Фото 1]</div>
+      <div id="resultArea" class="result" style="display:none">
+        <div class="result-title">[Фото 1]</div>
 
-                                                                                                                <div class="formats">
-                                                                                                                          <label class="format"><input type="radio" name="format" value="direct" checked> Прямая ссылка</label>
-                                                                                                                                    <label class="format"><input type="radio" name="format" value="html"> HTML &lt;img&gt;</label>
-                                                                                                                              <label class="format"><input type="radio" name="format" value="html_link"> HTML с ссылкой</label>
-                                                                                                                                                <label class="format"><input type="radio" name="format" value="bb_full_link"> BB-код со ссылкой</label>
-                                                                                                                                                        </div>
+        <div class="formats">
+          <label class="format"><input type="radio" name="format" value="direct" checked> Прямая ссылка</label>
+          <label class="format"><input type="radio" name="format" value="html"> HTML &lt;img&gt;</label>
+          <label class="format"><input type="radio" name="format" value="html_link"> HTML с ссылкой</label>
+          <label class="format"><input type="radio" name="format" value="bb_full_link"> BB-код со ссылкой</label>
+        </div>
 
-                                                                                                                                                                <div class="link-row" style="margin-top:8px">
-                                                                                                                                                                          <div id="linkText" class="link-text" aria-live="polite"></div>
-                                                                                                                                                                                    <button id="copyBtn" class="copy-btn">Копировать</button>
-                                                                                                                                                                                            </div>
+        <div class="link-row">
+          <div id="linkText" class="link-text" aria-live="polite"></div>
+          <button id="copyBtn" class="copy-btn">Копировать</button>
+        </div>
 
-                                                                                                                                                                                                    <div style="margin-top:8px"><a id="viewLink" href="#" target="_blank">Открыть изображение</a></div>
-                                                                                                                                                                                                          </div>
+        <a id="viewLink" href="#" target="_blank">Открыть изображение</a>
+      </div>
 
-                                                                                                                                                                                                                <footer>Подсказка: для публичных ссылок используй API-хостинг (imgbb/imgur) — так изображения будут доступны другим.</footer>
-                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                      </main>
+      <footer>
+        Красиво, просто и в тёмном стиле. Для публикации на сайте используй свой API-ключ imgbb.
+      </footer>
+    </div>
+  </main>
 
-    <script>
-    /*
-      Вариант: загрузка через imgbb API (который принимает base64).
-        Получи API ключ на https://imgbb.com и вставь ниже.
-        */
-        const IMGBB_API_KEY = '4a569847f7d6be115b4e46120f2d1f73'; // <- вставь свой ключ
+  <script>
+    // Вставь свой API-ключ imgbb
+    const IMGBB_API_KEY = '4a569847f7d6be115b4e46120f2d1f73';
 
-        const fileInput = document.getElementById('fileInput');
-        const status = document.getElementById('status');
-        const resultArea = document.getElementById('resultArea');
-        const linkText = document.getElementById('linkText');
-        const copyBtn = document.getElementById('copyBtn');
-        const viewLink = document.getElementById('viewLink');
+    const fileInput = document.getElementById('fileInput');
+    const status = document.getElementById('status');
+    const resultArea = document.getElementById('resultArea');
+    const linkText = document.getElementById('linkText');
+    const copyBtn = document.getElementById('copyBtn');
+    const viewLink = document.getElementById('viewLink');
 
-        let uploadedUrl = '';
+    let uploadedUrl = '';
 
-        fileInput.addEventListener('change', async () => {
-          if (!fileInput.files.length) return;
-            const file = fileInput.files[0];
-              const maxSize = 5*1024*1024;
-                if (file.size > maxSize) { status.innerHTML = '<div style="color:red">Файл больше 5 МБ.</div>'; return; }
-                  status.innerHTML = 'Загружаю <span class="spinner" aria-hidden="true"></span>';
+    fileInput.addEventListener('change', async () => {
+      if (!fileInput.files.length) return;
 
-                    // читаем как base64
-                      const reader = new FileReader();
-                        reader.onload = async (e) => {
-                            const base64 = e.target.result.split(',')[1]; // без префикса data:...
-                              try {
-                                  // формируем запрос для imgbb
-                                    const form = new FormData();
-                                        form.append('key', IMGBB_API_KEY);
-                                          form.append('image', base64);
+      const file = fileInput.files[0];
+      status.innerHTML = 'Загружаю <span class="spinner" aria-hidden="true"></span>';
 
-                                            const res = await fetch('https://api.imgbb.com/1/upload', { method:'POST', body: form });
-                                              const json = await res.json();
-                                                if (json.success) {
-                                                    uploadedUrl = json.data.url; // прямая ссылка
-                                                        status.innerHTML = '<span style="color:green">Готово — ссылка получена.</span>';
-                                                            resultArea.style.display = 'block';
-                                                                updateLinkText();
-                                                                    viewLink.href = uploadedUrl;
-                                                                      } else {
-                                                                          status.innerHTML = '<div style="color:red">Ошибка сервиса: ' + (json.error?.message || JSON.stringify(json)) + '</div>';
-                                                                            }
-                                                                              } catch (err) {
-                                                                                  status.innerHTML = '<div style="color:red">Ошибка сети или неверный API ключ.</div>';
-                                                                                    console.error(err);
-                                                                                      }
-                                                                                        };
-                                                                                          reader.readAsDataURL(file);
-                                                                                          });
+      const reader = new FileReader();
 
-                                                                                          document.querySelectorAll('input[name=format]').forEach(r => r.addEventListener('change', updateLinkText));
+      reader.onload = async (e) => {
+        const base64 = e.target.result.split(',')[1];
 
-                                                                                          function updateLinkText() {
-                                                                                            if (!uploadedUrl) return;
-                                                                                              const fmt = document.querySelector('input[name=format]:checked').value;
-                                                                                                let txt = '';
-                                                                                                  switch (fmt) {
-                                                                                                      case 'direct': txt = uploadedUrl; break;
-                                                                                                          case 'html': txt = `<img src="${uploadedUrl}" alt="Uploaded image">`; break;
-                                                                                                              case 'html_link': txt = `<a href="${uploadedUrl}" target="_blank"><img src="${uploadedUrl}" alt="Uploaded image"></a>`; break;
-                                                                                                                  case 'bb_full_link': txt = `[url=${uploadedUrl}][img]${uploadedUrl}[/img][/url]`; break;
-                                                                                                                    }
-                                                                                                                      linkText.textContent = txt;
-                                                                                                                      }
+        try {
+          const form = new FormData();
+          form.append('key', IMGBB_API_KEY);
+          form.append('image', base64);
 
-                                                                                                                      copyBtn.addEventListener('click', () => {
-                                                                                                                        navigator.clipboard.writeText(linkText.textContent).then(() => {
-                                                                                                                          copyBtn.textContent = 'Скопировано!';
-                                                                                                                            setTimeout(() => copyBtn.textContent = 'Копировать', 2000);
-                                                                                                                              }).catch(err => console.error('Ошибка копирования:', err));
-                                                                                                                              });
-                                                                                                                              </script>
+          const res = await fetch('https://api.imgbb.com/1/upload', {
+            method: 'POST',
+            body: form
+          });
+
+          const json = await res.json();
+
+          if (json.success) {
+            uploadedUrl = json.data.url;
+            status.innerHTML = '<span style="color:#2dd4bf;font-weight:700">Готово — ссылка получена.</span>';
+            resultArea.style.display = 'block';
+            updateLinkText();
+            viewLink.href = uploadedUrl;
+          } else {
+            status.innerHTML = '<span style="color:#ff7b7b">Ошибка сервиса: ' + (json.error?.message || 'неизвестная ошибка') + '</span>';
+          }
+        } catch (err) {
+          status.innerHTML = '<span style="color:#ff7b7b">Ошибка сети или неверный API ключ.</span>';
+          console.error(err);
+        }
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    document.querySelectorAll('input[name=format]').forEach(r => {
+      r.addEventListener('change', updateLinkText);
+    });
+
+    function updateLinkText() {
+      if (!uploadedUrl) return;
+
+      const fmt = document.querySelector('input[name=format]:checked').value;
+      let txt = '';
+
+      switch (fmt) {
+        case 'direct':
+          txt = uploadedUrl;
+          break;
+        case 'html':
+          txt = `<img src="${uploadedUrl}" alt="Uploaded image">`;
+          break;
+        case 'html_link':
+          txt = `<a href="${uploadedUrl}" target="_blank"><img src="${uploadedUrl}" alt="Uploaded image"></a>`;
+          break;
+        case 'bb_full_link':
+          txt = `[url=${uploadedUrl}][img]${uploadedUrl}[/img][/url]`;
+          break;
+      }
+
+      linkText.textContent = txt;
+    }
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(linkText.textContent).then(() => {
+        copyBtn.textContent = 'Скопировано!';
+        setTimeout(() => copyBtn.textContent = 'Копировать', 2000);
+      }).catch(err => console.error('Ошибка копирования:', err));
+    });
+  </script>
 </body>
-</html>
+    </html>
