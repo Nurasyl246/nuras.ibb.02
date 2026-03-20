@@ -322,8 +322,10 @@
   <main class="wrap">
     <div class="card">
       <div class="top-banner">
-  <div style="font-size:16px;margin-bottom:8px;">Подпишись на Нураса в ВК!</div>
-  <a href="https://vk.ru/nurasylsattar" target="_blank">ПОДПИСАТЬСЯ</a>
+        <div class="line1">Подпишись на Нураса в ВК!</div>
+        <div class="line2">Nuras.ibb</div>
+        <div style="margin-top:6px;color:#b8c8e8;font-size:13px;">Лучший способ делиться своими моментами</div>
+        <a href="https://vk.ru/nurasylsattar" target="_blank" rel="noopener">ПОДПИСАТЬСЯ</a>
       </div>
 
       <h1>Загрузите фото — получите ссылку</h1>
@@ -338,8 +340,14 @@
       <div id="status"></div>
 
       <div id="resultArea" class="result" style="display:none">
-  <div id="imagesContainer"></div>
-      </div>
+        <div class="result-title">[Фото 1]</div>
+
+        <div class="formats">
+          <label class="format"><input type="radio" name="format" value="direct" checked> Прямая ссылка</label>
+          <label class="format"><input type="radio" name="format" value="html"> HTML &lt;img&gt;</label>
+          <label class="format"><input type="radio" name="format" value="html_link"> HTML с ссылкой</label>
+          <label class="format"><input type="radio" name="format" value="bb_full_link"> BB-код со ссылкой</label>
+        </div>
 
         <div class="link-row">
           <div id="linkText" class="link-text" aria-live="polite"></div>
@@ -356,105 +364,93 @@
   </main>
 
   <script>
-const IMGBB_API_KEY = '4a569847f7d6be115b4e46120f2d1f73';
+    // Вставь свой API-ключ imgbb
+    const IMGBB_API_KEY = '4a569847f7d6be115b4e46120f2d1f73';
 
-const fileInput = document.getElementById('fileInput');
-const status = document.getElementById('status');
-const resultArea = document.getElementById('resultArea');
-const imagesContainer = document.getElementById('imagesContainer');
+    const fileInput = document.getElementById('fileInput');
+    const status = document.getElementById('status');
+    const resultArea = document.getElementById('resultArea');
+    const linkText = document.getElementById('linkText');
+    const copyBtn = document.getElementById('copyBtn');
+    const viewLink = document.getElementById('viewLink');
 
-fileInput.setAttribute("multiple", true);
+    let uploadedUrl = '';
 
-fileInput.addEventListener('change', async () => {
-  const files = Array.from(fileInput.files).slice(0, 20);
-  if (!files.length) return;
+    fileInput.addEventListener('change', async () => {
+      if (!fileInput.files.length) return;
 
-  status.innerHTML = `Загружаю ${files.length} фото <span class="spinner"></span>`;
-  imagesContainer.innerHTML = '';
+      const file = fileInput.files[0];
+      status.innerHTML = 'Загружаю <span class="spinner" aria-hidden="true"></span>';
 
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
+      const reader = new FileReader();
 
-    const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64 = e.target.result.split(',')[1];
 
-    reader.onload = async (e) => {
-      const base64 = e.target.result.split(',')[1];
+        try {
+          const form = new FormData();
+          form.append('key', IMGBB_API_KEY);
+          form.append('image', base64);
 
-      const form = new FormData();
-      form.append('key', IMGBB_API_KEY);
-      form.append('image', base64);
+          const res = await fetch('https://api.imgbb.com/1/upload', {
+            method: 'POST',
+            body: form
+          });
 
-      try {
-        const res = await fetch('https://api.imgbb.com/1/upload', {
-          method: 'POST',
-          body: form
-        });
+          const json = await res.json();
 
-        const json = await res.json();
-
-        if (json.success) {
-          createImageBlock(json.data, i + 1);
+          if (json.success) {
+            uploadedUrl = json.data.url;
+            status.innerHTML = '<span style="color:#2dd4bf;font-weight:700">Готово — ссылка получена.</span>';
+            resultArea.style.display = 'block';
+            updateLinkText();
+            viewLink.href = uploadedUrl;
+          } else {
+            status.innerHTML = '<span style="color:#ff7b7b">Ошибка сервиса: ' + (json.error?.message || 'неизвестная ошибка') + '</span>';
+          }
+        } catch (err) {
+          status.innerHTML = '<span style="color:#ff7b7b">Ошибка сети или неверный API ключ.</span>';
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    document.querySelectorAll('input[name=format]').forEach(r => {
+      r.addEventListener('change', updateLinkText);
+    });
+
+    function updateLinkText() {
+      if (!uploadedUrl) return;
+
+      const fmt = document.querySelector('input[name=format]:checked').value;
+      let txt = '';
+
+      switch (fmt) {
+        case 'direct':
+          txt = uploadedUrl;
+          break;
+        case 'html':
+          txt = `<img src="${uploadedUrl}" alt="Uploaded image">`;
+          break;
+        case 'html_link':
+          txt = `<a href="${uploadedUrl}" target="_blank"><img src="${uploadedUrl}" alt="Uploaded image"></a>`;
+          break;
+        case 'bb_full_link':
+          txt = `[url=${uploadedUrl}][img]${uploadedUrl}[/img][/url]`;
+          break;
       }
-    };
 
-    reader.readAsDataURL(file);
-  }
+      linkText.textContent = txt;
+    }
 
-  resultArea.style.display = 'block';
-  status.innerHTML = 'Готово ✅';
-});
-
-function createImageBlock(data, index) {
-  const url = data.url;
-  const medium = data.medium?.url || url;
-  const thumb = data.thumb?.url || url;
-
-  const block = document.createElement('div');
-  block.style.marginBottom = "25px";
-
-  block.innerHTML = `
-    <div style="font-weight:700;margin-bottom:10px">[Фото ${index}]</div>
-
-    ${makeRow("Ссылка на просмотр", url)}
-    ${makeRow("Прямая ссылка", url)}
-
-    <div style="margin-top:10px;font-weight:600">HTML-коды</div>
-    ${makeRow("HTML-код изображения", `<img src="${url}">`)}
-    ${makeRow("HTML полноразмерный со ссылкой", `<a href="${url}"><img src="${url}"></a>`)}
-    ${makeRow("HTML средний со ссылкой", `<a href="${url}"><img src="${medium}"></a>`)}
-    ${makeRow("HTML миниатюра со ссылкой", `<a href="${url}"><img src="${thumb}"></a>`)}
-
-    <div style="margin-top:10px;font-weight:600">BB-коды</div>
-    ${makeRow("BB полноразмерный", `[img]${url}[/img]`)}
-    ${makeRow("BB полноразмерный со ссылкой", `[url=${url}][img]${url}[/img][/url]`)}
-    ${makeRow("BB средний со ссылкой", `[url=${url}][img]${medium}[/img][/url]`)}
-    ${makeRow("BB миниатюра со ссылкой", `[url=${url}][img]${thumb}[/img][/url]`)}
-  `;
-
-  imagesContainer.appendChild(block);
-}
-
-function makeRow(title, value) {
-  return `
-    <div style="margin-top:6px">
-      <div style="font-size:12px;color:#aaa">${title}</div>
-      <div style="display:flex;gap:8px;margin-top:3px">
-        <div style="flex:1;background:#111;padding:6px;border-radius:6px;font-size:12px;word-break:break-all">${value}</div>
-        <button onclick="copyText(this)" style="padding:6px 10px;background:#3c7dff;border:none;color:white;border-radius:6px;cursor:pointer">📋</button>
-      </div>
-    </div>
-  `;
-}
-
-function copyText(btn) {
-  const text = btn.parentElement.querySelector('div').textContent;
-  navigator.clipboard.writeText(text);
-  btn.textContent = "✅";
-  setTimeout(() => btn.textContent = "📋", 1500);
-}
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(linkText.textContent).then(() => {
+        copyBtn.textContent = 'Скопировано!';
+        setTimeout(() => copyBtn.textContent = 'Копировать', 2000);
+      }).catch(err => console.error('Ошибка копирования:', err));
+    });
   </script>
 </body>
     </html>
