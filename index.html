@@ -686,17 +686,344 @@
       }).catch(err => console.error('Ошибка копирования:', err));
     }
 
-    async function copyAll() {
-  const blocks = Array.from(document.querySelectorAll('.image-block:not(.deleted)'));
-  const text = blocks.map(b => b.dataset.copyText).filter(Boolean).join('\n\n');
+    <script>
+  const IMGBB_API_KEY = '4a569847f7d6be115b4e46120f2d1f73';
 
-  if (!text) return;
+  const fileInput = document.getElementById('fileInput');
+  const status = document.getElementById('status');
+  const resultArea = document.getElementById('resultArea');
+  const imagesContainer = document.getElementById('imagesContainer');
+  const previewWrap = document.getElementById('previewWrap');
+  const previewGrid = document.getElementById('previewGrid');
+  const progressFill = document.getElementById('progressFill');
+  const progressPercent = document.getElementById('progressPercent');
+  const copyAllBtn = document.getElementById('copyAllBtn');
 
-  try {
-    await navigator.clipboard.writeText(text);
-    alert('Все ссылки скопированы!');
-  } catch (err) {
-    console.error(err);
-    alert('Ошибка копирования');
+  function setProgress(percent) {
+    const value = Math.max(0, Math.min(100, Math.round(percent)));
+    progressFill.style.width = value + '%';
+    progressPercent.textContent = value + '%';
   }
+
+  function safeText(value) {
+    return String(value ?? '');
+  }
+
+  function makeField(title, value) {
+    const field = document.createElement('div');
+    field.className = 'field';
+
+    const label = document.createElement('div');
+    label.className = 'field-title';
+    label.textContent = title;
+
+    const row = document.createElement('div');
+    row.className = 'field-row';
+
+    const ta = document.createElement('textarea');
+    ta.className = 'link-value';
+    ta.readOnly = true;
+    ta.value = safeText(value);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy-btn mini';
+    btn.textContent = 'Копировать';
+    btn.dataset.copyRow = '1';
+
+    row.appendChild(ta);
+    row.appendChild(btn);
+    field.appendChild(label);
+    field.appendChild(row);
+
+    return field;
+  }
+
+  function buildCopyText(index, data) {
+    const viewerUrl = data.url_viewer || '';
+    const fullUrl = data.url || '';
+    const displayUrl = data.display_url || fullUrl;
+    const mediumUrl = data.medium?.url || displayUrl;
+    const thumbUrl = data.thumb?.url || displayUrl;
+
+    return [
+      `[Фото ${index}]`,
+      'Ссылки на просмотр',
+      `Ссылка на просмотр: ${viewerUrl}`,
+      `Прямая ссылка: ${fullUrl}`,
+      '',
+      'HTML-коды',
+      `HTML-код изображения: <img src="${displayUrl}" alt="Uploaded image">`,
+      `HTML-код полноразмерного изображения со ссылкой: <a href="${viewerUrl}" target="_blank" rel="noopener"><img src="${fullUrl}" alt="Uploaded image"></a>`,
+      `HTML-код среднего размера со ссылкой: <a href="${viewerUrl}" target="_blank" rel="noopener"><img src="${mediumUrl}" alt="Uploaded image"></a>`,
+      `HTML-код миниатюры со ссылкой: <a href="${viewerUrl}" target="_blank" rel="noopener"><img src="${thumbUrl}" alt="Uploaded image"></a>`,
+      '',
+      'ВВ-коды',
+      `ВВ-код полноразмерного изображения: [img]${fullUrl}[/img]`,
+      `ВВ-код полноразмерного изображения со ссылкой: [url=${viewerUrl}][img]${fullUrl}[/img][/url]`,
+      `ВВ-код среднего размера со ссылкой: [url=${viewerUrl}][img]${mediumUrl}[/img][/url]`,
+      `ВВ-код миниатюры со ссылкой: [url=${viewerUrl}][img]${thumbUrl}[/img][/url]`
+    ].join('\n');
+  }
+
+  function createImageBlock(index, data) {
+    const viewerUrl = data.url_viewer || '';
+    const fullUrl = data.url || '';
+    const displayUrl = data.display_url || fullUrl;
+    const mediumUrl = data.medium?.url || displayUrl;
+    const thumbUrl = data.thumb?.url || displayUrl;
+    const deleteUrl = data.delete_url || '';
+
+    const block = document.createElement('div');
+    block.className = 'image-block';
+    block.dataset.copyText = buildCopyText(index, data);
+    block.dataset.deleteUrl = deleteUrl;
+
+    const head = document.createElement('div');
+    head.className = 'image-head';
+
+    const title = document.createElement('h3');
+    title.textContent = `[Фото ${index}]`;
+
+    const badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.textContent = 'Готово';
+
+    head.appendChild(title);
+    head.appendChild(badge);
+
+    const img = document.createElement('img');
+    img.className = 'uploaded-preview';
+    img.src = displayUrl;
+    img.alt = `Фото ${index}`;
+
+    const sec1 = document.createElement('div');
+    sec1.className = 'section-title';
+    sec1.textContent = 'Ссылки на просмотр';
+
+    const sec2 = document.createElement('div');
+    sec2.className = 'section-title';
+    sec2.textContent = 'HTML-коды';
+
+    const sec3 = document.createElement('div');
+    sec3.className = 'section-title';
+    sec3.textContent = 'ВВ-коды';
+
+    block.appendChild(head);
+    block.appendChild(img);
+    block.appendChild(sec1);
+    block.appendChild(makeField('Ссылка на просмотр', viewerUrl));
+    block.appendChild(makeField('Прямая ссылка', fullUrl));
+
+    block.appendChild(sec2);
+    block.appendChild(makeField('HTML-код изображения', `<img src="${displayUrl}" alt="Uploaded image">`));
+    block.appendChild(makeField(
+      'HTML-код полноразмерного изображения со ссылкой',
+      `<a href="${viewerUrl}" target="_blank" rel="noopener"><img src="${fullUrl}" alt="Uploaded image"></a>`
+    ));
+    block.appendChild(makeField(
+      'HTML-код среднего размера со ссылкой',
+      `<a href="${viewerUrl}" target="_blank" rel="noopener"><img src="${mediumUrl}" alt="Uploaded image"></a>`
+    ));
+    block.appendChild(makeField(
+      'HTML-код миниатюры со ссылкой',
+      `<a href="${viewerUrl}" target="_blank" rel="noopener"><img src="${thumbUrl}" alt="Uploaded image"></a>`
+    ));
+
+    block.appendChild(sec3);
+    block.appendChild(makeField('ВВ-код полноразмерного изображения', `[img]${fullUrl}[/img]`));
+    block.appendChild(makeField(
+      'ВВ-код полноразмерного изображения со ссылкой',
+      `[url=${viewerUrl}][img]${fullUrl}[/img][/url]`
+    ));
+    block.appendChild(makeField(
+      'ВВ-код среднего размера со ссылкой',
+      `[url=${viewerUrl}][img]${mediumUrl}[/img][/url]`
+    ));
+    block.appendChild(makeField(
+      'ВВ-код миниатюры со ссылкой',
+      `[url=${viewerUrl}][img]${thumbUrl}[/img][/url]`
+    ));
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.dataset.deleteImage = '1';
+    deleteBtn.textContent = 'Удалить изображение';
+
+    const deletedNote = document.createElement('div');
+    deletedNote.className = 'deleted-note';
+    deletedNote.textContent = 'Изображение помечено как удалённое.';
+
+    block.appendChild(deleteBtn);
+    block.appendChild(deletedNote);
+
+    return block;
+  }
+
+  function copyRow(button) {
+    const row = button.closest('.field-row');
+    if (!row) return;
+
+    const ta = row.querySelector('.link-value');
+    if (!ta) return;
+
+    navigator.clipboard.writeText(ta.value).then(() => {
+      const old = button.textContent;
+      button.textContent = 'Скопировано!';
+      setTimeout(() => {
+        button.textContent = old;
+      }, 1200);
+    }).catch(err => console.error('Ошибка копирования:', err));
+  }
+
+  async function copyAll() {
+    const blocks = Array.from(document.querySelectorAll('.image-block:not(.deleted)'));
+    const text = blocks.map(b => b.dataset.copyText).filter(Boolean).join('\n\n');
+
+    if (!text) return;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      const old = copyAllBtn.textContent;
+      copyAllBtn.textContent = 'Скопировано!';
+      setTimeout(() => {
+        copyAllBtn.textContent = old;
+      }, 1200);
+    } catch (err) {
+      console.error('Ошибка копирования:', err);
     }
+  }
+
+  function deleteImage(button) {
+    const block = button.closest('.image-block');
+    if (!block) return;
+
+    const deleteUrl = block.dataset.deleteUrl;
+    if (!deleteUrl) {
+      status.innerHTML = '<span style="color:#ff7b7b">Для этого фото не пришёл delete_url.</span>';
+      return;
+    }
+
+    const beacon = new Image();
+    beacon.src = deleteUrl + (deleteUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+
+    block.classList.add('deleted');
+    button.disabled = true;
+    button.textContent = 'Удалено';
+
+    status.innerHTML = '<span style="color:#2dd4bf;font-weight:700">Изображение отправлено на удаление.</span>';
+  }
+
+  document.addEventListener('click', (e) => {
+    const copyBtn = e.target.closest('[data-copy-row]');
+    if (copyBtn) {
+      copyRow(copyBtn);
+      return;
+    }
+
+    const delBtn = e.target.closest('[data-delete-image]');
+    if (delBtn) {
+      deleteImage(delBtn);
+    }
+  });
+
+  copyAllBtn.addEventListener('click', copyAll);
+
+  async function uploadOne(file, index, total) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+
+      reader.onerror = () => {
+        status.innerHTML = `<span style="color:#ff7b7b">Не удалось прочитать файл: ${file.name}</span>`;
+        resolve(false);
+      };
+
+      reader.onload = () => {
+        const base64 = String(reader.result).split(',')[1] || '';
+
+        const xhr = new XMLHttpRequest();
+        const form = new FormData();
+        form.append('key', IMGBB_API_KEY);
+        form.append('image', base64);
+
+        xhr.open('POST', 'https://api.imgbb.com/1/upload');
+
+        xhr.upload.onprogress = (event) => {
+          if (!event.lengthComputable) return;
+          const filePart = event.loaded / event.total;
+          const overall = (((index - 1) + filePart) / total) * 100;
+          setProgress(overall);
+          status.innerHTML = `Загрузка ${index}/${total}: ${Math.round(filePart * 100)}% <span class="spinner" aria-hidden="true"></span>`;
+        };
+
+        xhr.onload = () => {
+          try {
+            const json = JSON.parse(xhr.responseText);
+
+            if (json && json.success) {
+              const block = createImageBlock(index, json.data);
+              imagesContainer.appendChild(block);
+              copyAllBtn.disabled = false;
+              resolve(true);
+            } else {
+              status.innerHTML = `<span style="color:#ff7b7b">Ошибка сервиса: ${json?.error?.message || 'неизвестная ошибка'}</span>`;
+              resolve(false);
+            }
+          } catch (err) {
+            status.innerHTML = '<span style="color:#ff7b7b">Не удалось обработать ответ сервиса.</span>';
+            console.error(err);
+            resolve(false);
+          }
+        };
+
+        xhr.onerror = () => {
+          status.innerHTML = `<span style="color:#ff7b7b">Ошибка сети при загрузке файла: ${file.name}</span>`;
+          resolve(false);
+        };
+
+        xhr.send(form);
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  fileInput.addEventListener('change', async () => {
+    const files = Array.from(fileInput.files).slice(0, 20);
+    if (!files.length) return;
+
+    previewWrap.style.display = 'block';
+    previewGrid.innerHTML = '';
+    imagesContainer.innerHTML = '';
+    resultArea.style.display = 'block';
+    copyAllBtn.disabled = true;
+    setProgress(0);
+
+    if (fileInput.files.length > 20) {
+      status.innerHTML = '<span style="color:#fbbf24">Выбраны первые 20 фото.</span>';
+    } else {
+      status.innerHTML = '';
+    }
+
+    files.forEach(file => {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.alt = file.name;
+      previewGrid.appendChild(img);
+    });
+
+    for (let i = 0; i < files.length; i++) {
+      await uploadOne(files[i], i + 1, files.length);
+    }
+
+    setProgress(100);
+    if (imagesContainer.children.length > 0) {
+      status.innerHTML = '<span style="color:#2dd4bf;font-weight:700">Готово — все ссылки получены.</span>';
+    } else {
+      status.innerHTML = '<span style="color:#ff7b7b">Ничего не загрузилось.</span>';
+    }
+
+    fileInput.value = '';
+  });
+</script>
