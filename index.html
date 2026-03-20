@@ -23,11 +23,47 @@
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       color: var(--text);
+      overflow-x: hidden;
       background:
         radial-gradient(circle at top left, rgba(60,125,255,.20), transparent 26%),
         radial-gradient(circle at top right, rgba(116,167,255,.16), transparent 22%),
         radial-gradient(circle at bottom left, rgba(45,212,191,.10), transparent 20%),
         linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .glow {
+      position: fixed;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      filter: blur(36px);
+      opacity: .22;
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 12s ease-in-out infinite;
+    }
+    .g1 { top: 8%; left: 6%; background: #2f6bff; }
+    .g2 { top: 18%; right: 6%; background: #6ea8ff; animation-duration: 16s; }
+    .g3 { bottom: 8%; left: 18%; background: #0ea5e9; animation-duration: 18s; }
+
+    @keyframes drift {
+      0%,100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(18px,-20px) scale(1.08); }
+    }
+
+    @keyframes floatUp {
+      0%,100% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(-10px) translateX(6px); }
+    }
+
+    @keyframes shine {
+      0%, 35% { transform: translateX(-120%); }
+      70%, 100% { transform: translateX(120%); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .wrap {
@@ -36,6 +72,8 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
+      position: relative;
+      z-index: 1;
     }
 
     .card {
@@ -47,6 +85,19 @@
       box-shadow: var(--shadow);
       padding: 22px;
       backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(120deg, transparent 0%, rgba(255,255,255,.05) 35%, transparent 70%);
+      transform: translateX(-120%);
+      animation: shine 6s ease-in-out infinite;
+      pointer-events: none;
     }
 
     .top-banner {
@@ -55,6 +106,10 @@
       border-radius: 18px;
       padding: 14px 16px;
       margin-bottom: 18px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+      animation: floatUp 5s ease-in-out infinite;
+      position: relative;
+      z-index: 1;
     }
 
     .top-banner .line1 {
@@ -67,6 +122,7 @@
       font-size: 18px;
       font-weight: 700;
       color: #ffffff;
+      letter-spacing: .2px;
     }
 
     .top-banner a {
@@ -79,18 +135,36 @@
       font-weight: 700;
       border: 1px solid rgba(116,167,255,.55);
       background: linear-gradient(135deg, #214cff, #4a86ff);
+      box-shadow: 0 10px 24px rgba(47,107,255,.25);
+      transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    }
+
+    .top-banner a:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 14px 28px rgba(47,107,255,.35);
+      filter: brightness(1.05);
     }
 
     h1 {
       margin: 0 0 10px;
       font-size: clamp(26px, 4vw, 38px);
       line-height: 1.1;
+      position: relative;
+      z-index: 1;
     }
 
     .subtitle {
       margin: 0 0 18px;
       color: var(--muted);
       font-size: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .upload-wrap {
+      margin: 16px 0 10px;
+      position: relative;
+      z-index: 1;
     }
 
     .upload-btn {
@@ -109,6 +183,13 @@
       letter-spacing: .8px;
       text-transform: uppercase;
       user-select: none;
+      transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    }
+
+    .upload-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 40px rgba(13,78,143,.32);
+      filter: brightness(1.06);
     }
 
     .small {
@@ -124,6 +205,8 @@
       border-radius: 16px;
       background: rgba(255,255,255,.03);
       border: 1px solid rgba(116,167,255,.12);
+      position: relative;
+      z-index: 1;
     }
 
     .progress-top {
@@ -160,18 +243,19 @@
       color: #fff;
       font-weight: 800;
       cursor: pointer;
+      transition: transform .2s ease, filter .2s ease, opacity .2s ease;
     }
 
-    .copy-all-btn:disabled {
-      opacity: .5;
-      cursor: not-allowed;
-    }
+    .copy-all-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .copy-all-btn:disabled { opacity: .5; cursor: not-allowed; }
 
     #status {
       margin-top: 12px;
       min-height: 22px;
       color: var(--text);
       font-size: 14px;
+      position: relative;
+      z-index: 1;
     }
 
     .preview-wrap, .result-wrap {
@@ -180,6 +264,8 @@
       border-radius: 16px;
       background: rgba(255,255,255,.03);
       border: 1px solid rgba(116,167,255,.12);
+      position: relative;
+      z-index: 1;
     }
 
     .preview-title, .result-title {
@@ -246,6 +332,12 @@
       cursor: pointer;
       font-weight: 800;
       white-space: nowrap;
+      transition: transform .2s ease, filter .2s ease;
+    }
+
+    .copy-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.06);
     }
 
     footer {
@@ -254,16 +346,23 @@
       font-size: 12px;
       line-height: 1.5;
       text-align: center;
+      position: relative;
+      z-index: 1;
     }
 
     @media (max-width: 520px) {
       .card { padding: 16px; }
       .link-head { flex-direction: column; align-items: flex-start; }
       .copy-btn { width: 100%; }
+      .top-banner .line2 { font-size: 16px; }
     }
   </style>
 </head>
 <body>
+  <div class="glow g1" aria-hidden="true"></div>
+  <div class="glow g2" aria-hidden="true"></div>
+  <div class="glow g3" aria-hidden="true"></div>
+
   <main class="wrap">
     <div class="card">
       <div class="top-banner">
@@ -454,4 +553,4 @@
     });
   </script>
 </body>
-                                                                                             </html>
+  </html>
